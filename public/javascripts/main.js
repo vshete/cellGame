@@ -21,14 +21,15 @@ app.controller('HomeController', function($scope, $interval) {
   $scope.M = 4;
   $scope.N = 5;
   $scope.chances = 3;
-  $scope.T = ($scope.N + 1) * 1000;
+  $scope.T = ($scope.N - 1) * 1000;
   $scope.randList = getRandom($scope.N);
 
   $scope.validate = function() {
-    if($scope.N > Math.pow($scope.M, 2)) {
+    if($scope.M < 2) $scope.M = 2;
+    if($scope.N > Math.pow($scope.M, 2) || $scope.N <= 1) {
       $scope.N = $scope.M;
     }
-    $scope.T = ($scope.N + 1) * 1000;
+    $scope.T = ($scope.N - 1) * 1000;
   };
 
   $scope.getCellStyle = function($index, $parent) {
@@ -124,7 +125,7 @@ app.controller('HomeController', function($scope, $interval) {
     $scope.M = 4;
     $scope.N = 5;
     $scope.chances = 3;
-    $scope.T = ($scope.N + 1) * 1000;
+    $scope.T = ($scope.N - 1) * 1000;
     $scope.randList = getRandom($scope.N);
   };
 
