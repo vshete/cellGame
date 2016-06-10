@@ -1,0 +1,138 @@
+<section class="game-wrapper" ng-controller="HomeController">
+	<!-- <div ng-click="rechance()">Rechance</div> -->
+	<div class="params">
+		<div class="grid-size-wrapper">
+			<label>Enter grid size:</label>
+			<input type="number" ng-model="M" class="grid-size">
+		</div>
+		<div class="n-wrapper">
+			<label>Enter N:</label>
+			<input type="number" ng-model="N" class="n">
+		</div>
+	</div>
+	<div class="countdown-label">Countdown</div>
+	<div class="countdown-wrapper">
+		<div class="time-ss">{{Math.floor(T/1000)}}</div>
+		<div class="seperator">:</div>
+		<div class="time-ms">{{T%1000}}</div>
+	</div>
+	<!-- <div ng-show="message">{{message}}</div> -->
+	<div class="grid-wrapper">
+		<div ng-repeat="row in [] | range:M" ng-style="getRowStyle($index)" class="cell-row">
+			<div ng-repeat="col in [] | range:M" class="cell" ng-style="getCellStyle($index, $parent.$index)" ng-click="discard($index, $parent.$index)" decolorize></div>
+		</div>
+	</div>
+	<div class="success-message" ng-show="success">
+		<div>You completed the game with {{Math.floor(T/1000)}} s and {{T%1000}} ms to spare.
+		Congrats! You won the game!</div>
+		<div class="close-btn-wrapper"><button class="btn" ng-click="success=null; reset();">Close</button></div>
+	</div>
+	<div class="failure-message" ng-show="failure">
+		<div>Oh no..! you did not make it..! You can try {{chances || 'no'}} more times</div>
+		<div class="failure-close-btn-wrapper">
+			<button class="btn" ng-click="rechance()">Retry</button>
+			<button class="btn" ng-click="failure=null; reset();">Close</button>
+		</div>
+	</div>
+</section>
+<style type="text/css">
+	body {
+		background-color: #222222; 
+		color: #FFFFFF;
+	}
+	/* For universal hide and show effects */
+	.ng-hide {
+		transition: 0.5s linear all;
+		opacity: 0;
+	}
+	.ng-show {
+		transition: 0.5s linear all;
+	  	opacity: 0;	
+	}
+	.params {
+		width: 350px;
+		margin: 10px auto;
+	}
+	.params > div {
+		display: inline-block;
+		vertical-align: middle;
+		margin: 0 5px;
+	}
+	.grid-size, .n {
+		width: 50px;
+		height: 30px;
+		border-radius: 3px;
+		border: none;
+		text-align: center;
+	}
+	.grid-wrapper {
+		overflow: hidden;
+		margin-top: 5px; 
+	}
+	.cell {
+		float: left;
+		width: 74px;
+		height: 74px;
+		border-right: 1px solid #777777;
+		border-bottom:  1px solid #777777;
+		background-color: #FFFFFF;
+		cursor: pointer;
+	}
+	.cell-row {
+		clear: both;
+		margin: auto;
+	}
+	.countdown-label {
+		text-align: center;
+	}
+	.countdown-wrapper {
+		width: 100px;
+		margin: auto;
+	}
+	.countdown-wrapper > div {
+		display: inline-block;
+		vertical-align: middle;
+	}
+	.time-ss, .time-ms {
+		overflow: hidden;
+		text-align: center;
+		width: 40px;
+		height: 30px;
+		margin: 2px;
+		padding-top: 5px;
+		box-sizing: border-box;
+		background-color: #FFFFFF;
+		color: #000000;
+		border-radius: 3px;
+	}
+	.success-message, .failure-message {
+		width: 500px;
+		height: 80px;
+		padding: 10px;
+		position: absolute;
+		left: 50%;
+		top: 50%;
+		margin: -40px 0 0 -250px;
+		color:#FFFFFF;
+		background-color: #333333;
+		border: 2px solid #FFFFFF;
+		text-align: center;
+	}
+	.close-btn-wrapper {
+		width: 100px;
+		margin: 10px auto;
+	}
+	.failure-close-btn-wrapper {
+		width: 220px;
+		margin: 10px auto;
+	}
+	.btn {
+		border: none;
+		background-color: #FFFFFF;
+		color: #333333;
+		width: 100px;
+		height: 30px;
+		text-align: center;
+		cursor: pointer;
+	}
+</style>
