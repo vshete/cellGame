@@ -18,18 +18,14 @@ app.run();
 
 app.controller('HomeController', function($scope, $interval) {
   $scope.Math = Math;
-  $scope.M = 4;
-  $scope.N = 5;
-  $scope.chances = 3;
-  $scope.T = ($scope.N - 1) * 1000;
-  $scope.randList = getRandom($scope.N);
 
   $scope.validate = function() {
     if($scope.M < 2) $scope.M = 2;
     if($scope.N > Math.pow($scope.M, 2) || $scope.N <= 1) {
       $scope.N = $scope.M;
     }
-    $scope.T = ($scope.N - 1) * 1000;
+    // Default time setting. (optional: you can carry on with users previous setting.)
+    $scope.claim = $scope.N - 1;
   };
 
   $scope.getCellStyle = function($index, $parent) {
@@ -59,7 +55,8 @@ app.controller('HomeController', function($scope, $interval) {
 
   // Decolorize a cell after it has been clicked.
   $scope.discard = function($index, $parent) {
-    if($scope.T == 0) return false;
+    if($scope.T == 0 || $scope.failure || $scope.success) return false;
+    if($scope.chances <= 0 && !$scope.isCounting()) return false;/*$scope.chances = 3;*/
     var current = $parent * $scope.M + $index;
     for(var idx in $scope.randList) {
       if($scope.randList[idx] == current) {
@@ -105,6 +102,7 @@ app.controller('HomeController', function($scope, $interval) {
     return result;
   };
 
+  /* To start the interval */
   var stop;
   $scope.startCountDown = function() {
     $scope.chances--;
@@ -113,6 +111,7 @@ app.controller('HomeController', function($scope, $interval) {
     }, 100, $scope.T/100);
   };
 
+  /* To stop the runnign interval. */
   $scope.stopCountDown = function() {
     if (angular.isDefined(stop)) {
       $interval.cancel(stop);
@@ -120,12 +119,20 @@ app.controller('HomeController', function($scope, $interval) {
     }
   };
 
+  /* Lets you know if interval is running */
+  $scope.isCounting = function() {
+    if(stop) return true;
+    return false;
+  };
+
+  /* Sets all the parameters in scope to default values. */
   $scope.reset = function() {
     $scope.stopCountDown();
     $scope.M = 4;
     $scope.N = 5;
     $scope.chances = 3;
-    $scope.T = ($scope.N - 1) * 1000;
+    $scope.claim = $scope.N - 1;
+    $scope.T = $scope.claim * 1000;
     $scope.randList = getRandom($scope.N);
   };
 
@@ -134,7 +141,7 @@ app.controller('HomeController', function($scope, $interval) {
     if($scope.chances == 0) return false;
     if($scope.randList.length == 0) return false;
     $scope.failure = null;
-    $scope.T = 1000 * ($scope.N + 1);
+    $scope.T = 1000 * ($scope.claim);
     var len = $scope.randList.length;
     var newRand = getRandom(($scope.N - len), $scope.randList);
     for(var x in newRand) {
@@ -159,6 +166,19 @@ app.controller('HomeController', function($scope, $interval) {
       $scope.failure = true;
     }
   });
+
+  /* Watcher to change T when users claim changes. */
+  $scope.$watch('claim', function() {
+    /* This if condition is requried to prevent time limit change
+    *  while running the interval. Absence of this can help the user cheat
+    *  by increasing the time while counting.
+    */
+    if($scope.isCounting()) return false;
+    $scope.T = $scope.claim * 1000;
+  });
+
+  /* To reset the scope to defaults. */
+  $scope.reset();
 });
 
 /* filter to create a dummy list to iterate n times  (using ng-repeat) */
