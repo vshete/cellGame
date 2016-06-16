@@ -56,11 +56,11 @@ app.controller('HomeController', function($scope, $interval) {
   // Decolorize a cell after it has been clicked.
   $scope.discard = function($index, $parent) {
     if($scope.T == 0 || $scope.failure || $scope.success) return false;
-    if($scope.chances <= 0 && !$scope.isCounting()) return false;/*$scope.chances = 3;*/
+    if($scope.chances <= 0 && !$scope.isCounting()) return false;
     var current = $parent * $scope.M + $index;
     for(var idx in $scope.randList) {
       if($scope.randList[idx] == current) {
-        if($scope.randList.length == $scope.N) $scope.startCountDown();
+        if($scope.randList.length == $scope.N && !$scope.isCounting()) $scope.startCountDown();
         $scope.randList.splice(idx, 1);
         if($scope.randList.length == 0) {
           $scope.stopCountDown();
@@ -105,6 +105,7 @@ app.controller('HomeController', function($scope, $interval) {
   /* To start the interval */
   var stop;
   $scope.startCountDown = function() {
+    if($scope.chances == 0) return false;
     $scope.chances--;
     stop = $interval(function() {
       $scope.T -= 100;
@@ -113,7 +114,7 @@ app.controller('HomeController', function($scope, $interval) {
 
   /* To stop the runnign interval. */
   $scope.stopCountDown = function() {
-    if (angular.isDefined(stop)) {
+    if(angular.isDefined(stop)) {
       $interval.cancel(stop);
       stop = undefined;
     }
@@ -162,7 +163,14 @@ app.controller('HomeController', function($scope, $interval) {
   });
 
   $scope.$watch('T', function() {
+    if($scope.T <= 0) $scope.stopCountDown();
     if($scope.T == 0 && $scope.randList.length != 0) {
+      if($scope.chances > 0) {
+        $scope.T = $scope.claim * 1000;
+        $scope.rechance();
+        $scope.startCountDown();
+        return true;
+      }
       $scope.failure = true;
     }
   });
